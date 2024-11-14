@@ -51,13 +51,13 @@ def recognize(image_path: str, encoding_path: str):
     with encoding_path.open(mode='rb') as file:
         encodings = pickle.load(file)
 
-    known_encoding = encodings[0]
+    known_encoding = encodings
 
     image = face_recognition.load_image_file(image_path)
 
-    face_encodings = face_recognition.face_encodings(image)[0]
+    face_encodings = face_recognition.face_encodings(image)
     
-    is_recognized = face_recognition.compare_faces([known_encoding], face_encodings)
+    is_recognized = face_recognition.compare_faces(known_encoding, face_encodings)
     if is_recognized:
         print("Face recognized")
     else:
