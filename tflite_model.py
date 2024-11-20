@@ -67,26 +67,28 @@ def train_dense():
     model.compile(
         optimizer='adam',
         loss='categorical_crossentropy',
+    
         metrics=['accuracy']
     )
 
-    model.fit(train_ds, val_ds, epochs=5)
+    model.fit(train_ds, validation_data=val_ds, batch_size=BATCH_SIZE, epochs=5)
 
     return model
-
 
 
 def convert_to_tflite(model):
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     tflite_model = converter.convert()
-    
+
     return tflite_model
+
 
 def write_model(model, name):
     with open(name, 'wb') as f:
         f.write(model)
 
+
 if __name__ == "__main__":
-    model = train_convolution()
+    model = train_dense()
     model = convert_to_tflite(model)
     write_model(model, "tflite_model")
