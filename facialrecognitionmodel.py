@@ -3,7 +3,7 @@ import cv2
 
 class FacialRecognitionModel:
     def __init__(self, tflite_model):
-        self.interpreter = tf.lite.Interpreter(mode_content=tflite_model)
+        self.interpreter = tf.lite.Interpreter(model_content=tflite_model)
         self.interpreter.allocate_tensor()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
