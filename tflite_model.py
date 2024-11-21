@@ -7,9 +7,10 @@ import sys
 data_directory = sys.argv[1]
 
 VALIDATION_SPLIT = 0.2
-IMAGE_HEIGHT = 2944
-IMAGE_WIDTH = 2208
-BATCH_SIZE = 3
+IMAGE_HEIGHT = 224
+IMAGE_WIDTH = 224
+BATCH_SIZE = 32
+EPOCHS = 10
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_directory,
@@ -17,7 +18,7 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     subset='training',
     seed=123,
     image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
-    batch_size=BATCH_SIZE,
+    batch_size=BATCH_SIZE
 )
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
@@ -37,7 +38,6 @@ AUTOTUNE = tf.data.AUTOTUNE
 
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
 
 def train_convolution():
     model = tf.keras.Sequential([
@@ -71,9 +71,46 @@ def train_dense():
         metrics=['accuracy']
     )
 
-    model.fit(train_ds, validation_data=val_ds, batch_size=BATCH_SIZE, epochs=5)
+    model.fit(train_ds, validation_data=val_ds, batch_size=BATCH_SIZE, epochs=EPOCHS)
 
     return model
+
+def train_resnet50():
+    model = tf.keras.Sequential()
+    model.add(
+        tf.keras.applications.resnet50.ResNet50(
+            weights='imagenet'
+        )
+    )
+
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(train_ds, validation_data=val_ds, batch_size=BATCH_SIZE, epochs=EPOCHS)
+
+    return model
+
+def train_vgg16(): 
+    model = tf.keras.applications.VGG16(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        classifier_activation='softmax'
+    )
+
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(train_ds, validation_data=val_ds, batch_size=BATCH_SIZE, epochs=EPOCHS)
 
 
 def convert_to_tflite(model):
@@ -91,4 +128,4 @@ def write_model(model, name):
 if __name__ == "__main__":
     model = train_dense()
     model = convert_to_tflite(model)
-    write_model(model, "tflite_model")
+    write_model(model, "tflite_model.tflite")

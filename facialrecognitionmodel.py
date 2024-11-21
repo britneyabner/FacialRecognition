@@ -1,29 +1,19 @@
 import tensorflow as tf
-import pathlib
 import cv2
-import numpy as np
 
 class FacialRecognitionModel:
-    def __init__(self, model_path: str):
-        self.interpreter = tf.lite
-        self.interpreter = tf.lite.interpreter(model_path=model_path)
-        self.interpreter.allocate_tensors()
+    def __init__(self, tflite_model):
+        self.interpreter = tf.lite.Interpreter(mode_content=tflite_model)
+        self.interpreter.allocate_tensor()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
-    def recognize(self, image) -> bool:
-        self.interpreter.set_tensor(self.input_details[0]["index"], image)
+    def detect(self, input_data):
+        self.interpreter.set_tensor(self.input_details[0]['index'], input_data)
         self.interpreter.invoke()
-        tflite_interpreter_output = self.interpreter.get_tensor(self.output_details[0]["index"])
-        probabilities = np.array(tflite_interpreter_output[0])
-        probabilities = tf.nn.softmax(probabilities)
-        largest_prob = tf.math.argmax(probabilities)
-        
-        if probabilities[largest_prob] >= 0.75:
-            return True
-        else:
-            return False
+        results = self.interpreter.get_tensor(self.output_details[0]['index'])
 
+        return results
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades +
                                      'haarcascade_frontalface_default.xml')
@@ -42,7 +32,8 @@ def get_face(image, width, height):
                          detected_faces[0][2]]
 
         return face_crop
-    return None
+    else:
+        return None
 
 
 

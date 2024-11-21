@@ -7,7 +7,7 @@ data_directory = '/home/britneyabner/Dropbox//School/Fall2024/ComputerEngineerin
 
 for i, image in enumerate(images):
     img = Image.open(str(image))
-    img = img.resize((128, 128))
+    img = img.resize((224, 224))
     file_name = data_directory + '/image_' + str(i) + '.jpg'
     print(file_name)
     img.save(file_name)

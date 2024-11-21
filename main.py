@@ -5,7 +5,7 @@ import glob
 
 VIDEO_NAME = "test_video"
 IMAGE_DIRECTORY = "test_images"
-MODEL = "model.tflite"
+MODEL = "tflite_model.tflite"
 IMAGE_WIDTH = 128
 IMAGE_HEIGHT = 128
 
@@ -31,3 +31,7 @@ def main():
         print("Face recognized")
     else:
         print("Face not recognized")
+
+
+if __name__ == "__main__":
+    main()
